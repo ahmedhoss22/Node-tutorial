@@ -1,0 +1,30 @@
+require("dotenv").config()
+const express =require ("express")
+const app = express()
+const cookieParser=require("cookie-parser")
+const path=require("path")
+const dbConn=require("./config/db_connection")
+const mongoose =require("mongoose")
+const routes=require("./routes/root")
+const cors= require("cors")
+const corsConfig=require ("./config/cors")
+const logger=require("./middlerware/logger")
+dbConn()
+app.use(cors(corsConfig))
+app.use(cookieParser())
+app.use(express.json())
+app.use(logger)
+// app.use("/",express.static(path.join(__dirname,"views")))
+app.use(routes)
+
+app.all("*",(req,res)=>{
+    res.status(404)
+    if(req.accepts('html')) return res.sendFile(path.join(__dirname,'views',"404.html"))
+    else if(req.accepts('json')) return res.send({message: "404 Page not found"})
+    else return res.type("text").send("404 Page not found")
+})
+
+mongoose.connection.once('open',()=>console.log("connected to DB"))
+
+const port = process.env.PORT || 5000
+app.listen(port,()=>console.log(`App is running on port ${port}`))
