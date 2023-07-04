@@ -1,8 +1,9 @@
 const { format, createLogger, transports } = require('winston');
 const { timestamp, combine, printf, errors,json } = format;
+const { v4 } = require('uuid');
 
 const logFormat = printf(({ level, message, timestamp, stack ,obj}) => {
-    let logMessage= `${timestamp} | ${level.toLocaleUpperCase()} | ${stack || message}`;
+    let logMessage= `${timestamp}| ${v4()} | ${level.toLocaleUpperCase()} | ${stack || message}`;
     logMessage= obj? message + " | " + JSON.stringify(obj) : logMessage;
     return logMessage
 })
